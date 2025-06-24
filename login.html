@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head><title>Login with Spotify</title></head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #eee;
+      align-items: center;
+      text-align: center;
+    }
+
+    h1 {
+      color: #1DB954;
+      align-items: center;
+      text-align: center;
+    }
+
+    a {
+     color: #eee;
+      align-items: center;
+      text-align: center;
+    }
+
+    .view-toggle {
+      background: #1DB954;
+      color: #121212;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .type-toggle {
+      background: #1DB954;
+      color: #121212;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .list-view {
+      display: block;
+    }
+
+    .tile {
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 1rem;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card {
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 1rem;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tile:hover {
+      transform: scale(1.03);
+      background: #2a2a2a;
+    }
+
+    .medium .tile img {
+      width: 120px;
+      height: 120px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .smol .tile img {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .big .tile img {
+      width: 150px;
+      height: 150px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .tile img {
+      width: 120px;
+      height: 120px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .tile .info {
+      flex: 1;
+    }
+
+    .tile .track-title {
+      font-size: 1.1rem;
+      color: #1DB954;
+      margin-bottom: 0.3rem;
+    }
+
+    .tile .artist {
+      color: #ccc;
+      margin-bottom: 0.3rem;
+    }
+
+    .tile .date {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* List-specific override */
+    .list-view .tile {
+      flex-direction: row;
+    }
+    .list-view .tile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .overlay-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1e1e1e;
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px black;
+  z-index: 1000;
+  display: none;
+  width: 300px;
+}
+
+.overlay-card img {
+  width: 100%;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: none;
+  background: rgba(255, 255, 255, 0.05); /* semi-transparent */
+  backdrop-filter: blur(20px); /* THE FROST!! */
+  -webkit-backdrop-filter: blur(10px); /* Safari needs her own */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translate(-50%, -50%);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+
+.overlay-card.show {
+  animation: popIn 0.2s ease-out;
+}
+
+  </style>
+<body>
+  <h1    style="align-items: center;">Login to See Your Spotify Stats!</h1>
+   <button class="type-toggle" onclick="document.location='/login'">Login</button>
+
+</body>
+</html>

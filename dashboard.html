@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OpenStats</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #eee;
+      margin: 2rem;
+      align-items: center;
+      text-align: center;
+    }
+
+    h1 {
+      color: #1DB954;
+      margin-bottom: 1rem;
+    }
+
+    a {
+     color: #eee;
+
+    }
+
+    .view-toggle {
+      background: rgba(20,20,20,0.7);
+      color: #121212;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 1rem;
+        transition: transform 0.3s ease-out, background 0.3s ease-out;
+    }
+
+    .view-toggle:hover {
+          background: rgba(55, 55, 55, 0.7);
+          transform: scale(1.1) translate(0, 1px);
+
+
+    }
+
+
+        .type-toggle:hover {
+          background: rgba(55, 55, 55, 0.7);
+          transform: scale(1.1) translate(0, 1px);
+
+
+    }
+    .type-toggle {
+      background: rgba(20,20,20,0.7);
+      color: #121212;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease-out, background 0.3s ease-out;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .list-view {
+      display: block;
+    }
+
+    .tile {
+      background: rgba(30, 30, 30, 0.6);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card {
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 1rem;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tile:hover {
+      transform: scale(1.03);
+      background: rgba(55, 55, 55, 0.6);
+
+    }
+
+    .medium .tile img {
+      width: 120px;
+      height: 120px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .smol .tile img {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .big .tile img {
+      width: 150px;
+      height: 150px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .tile img {
+      width: 120px;
+      height: 120px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .tile .info {
+      flex: 1;
+    }
+
+    .tile .track-title {
+      font-size: 1.1rem;
+      color: #1DB954;
+      margin-bottom: 0.3rem;
+    }
+
+    .tile .artist {
+      color: #ccc;
+      margin-bottom: 0.3rem;
+    }
+
+    .tile .date {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* List-specific override */
+    .list-view .tile {
+      background: rgba(30, 30, 30, 0.7);
+      flex-direction: row;
+      text-align: left;
+    }
+    .list-view .tile:hover{
+    background: rgba(55, 55, 55, 0.6);
+    }
+
+    .list-view .tile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+
+.overlay-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30, 30, 30, 0.8);
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px black;
+  z-index: 1000;
+
+  display: none;            /* horizontal layout */
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 90vw;
+}
+
+.overlay-card img {
+  align-items: center;
+  width: 300px;
+  height: auto;
+  border-radius: 5px;
+  margin-bottom: 0;
+}
+
+.card-details {
+  display: flex;            /* vertical layout */
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+
+.player-bar {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #1DB954; /* Spotify green */
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.track-art {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+.track-info {
+  flex-grow: 1;
+}
+
+.track-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.track-artist {
+  font-size: 14px;
+  color: #f0f0f0;
+}
+
+.open-link {
+  background: white;
+  color: #1DB954;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.open-link:hover {
+  background: #f0f0f0;
+}
+/* Enhanced Player Bar */
+.player-bar {
+  position: fixed;
+  bottom: 0;
+  left: 3%; right: 3%;
+  display: none;
+  grid-template-columns: auto 1fr 2fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(24, 24, 24, 0.7);
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 9999;
+    backdrop-filter: blur(20px); /* THE FROST!! */
+  -webkit-backdrop-filter: blur(10px); /* Safari needs her own */
+}
+
+.player-bar .icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  height: 20px;
+  width: auto;
+  transition: background 0.2s;
+}
+
+.player-bar .icon-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.player-bar .track-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.player-bar .track-art {
+  width: 50px; height: 50px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.player-bar .text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.player-bar .track-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.player-bar .track-artist {
+  font-size: 12px;
+  color: #ccc;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.player-bar .center-controls,
+.player-bar .right-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.player-bar input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.player-bar input[type="range"]::-webkit-slider-runnable-track {
+  background: #555;
+}
+
+.player-bar input[type="range"]::-moz-range-track {
+  background: #555;
+}
+.player-bar input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default appearance */
+  appearance: none;
+  opacity: 0; /* Make the thumb transparent */
+  width: 0; /* Set width to zero */
+  height: 0; /* Set height to zero */
+}
+
+/* Hide the thumb in Firefox */
+.player-bar input[type=range]::-moz-range-thumb {
+  -moz-appearance: none; /* Override default appearance */
+  appearance: none;
+  opacity: 0; /* Make the thumb transparent */
+  width: 0; /* Set width to zero */
+  height: 0; /* Set height to zero */
+}
+
+.player-bar input[type=range]:hover::-webkit-slider-thumb {
+  -webkit-appearance: default; /* Override default appearance */
+  appearance: none;
+  opacity: 1; /* Make the thumb transparent */
+  width: 5px; /* Set width to zero */
+  height: 5px; /* Set height to zero */
+  background: #ffffff;
+}
+
+/* Hide the thumb in Firefox */
+.player-bar input[type=range]:hover::-moz-range-thumb {
+  -moz-appearance: default; /* Override default appearance */
+  appearance: none;
+  opacity: 1; /* Make the thumb transparent */
+  width: 5px; /* Set width to zero */
+  height: 5px; /* Set height to zero */
+  background: #ffffff;
+}
+
+.player-bar #volume {
+  width: 80px;
+}
+
+.player-bar .open-link {
+  background: #1DB954;
+  appearance: none;
+  color: #121212;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.player-bar .open-link:hover {
+  background: #1ed760;
+}
+
+/* Responsive tweak */
+@media (max-width: 600px) {
+  .player-bar {
+    grid-template-columns: auto 1fr auto;
+  }
+  .player-bar .center-controls { display: none; }
+}
+
+
+/* For Webkit browsers (Chrome, Safari) */
+.player-bar input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #ddd var(--progress), #555 var(--progress));
+}
+
+/* For Firefox */
+.player-bar input[type="range"]::-moz-range-track {
+  background: linear-gradient(to right, #ddd var(--progress), #555 var(--progress));
+}
+
+/* Progress slider */
+#progress::-moz-range-track {
+  background: linear-gradient(to right, #ddd var(--progress), #555 var(--progress));
+}
+
+/* Volume slider */
+#volume::-moz-range-track {
+  background: linear-gradient(to right, #ddd var(--progress), #555 var(--progress));
+}
+
+
+/* Progress slider */
+#progress::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #4CAF50 var(--progress), #ddd var(--progress));
+}
+
+/* Volume slider */
+#volume::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #4CAF50 var(--progress), #ddd var(--progress));
+}
+
+
+.overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: none;
+  background: rgba(255, 255, 255, 0.05); /* semi-transparent */
+  backdrop-filter: blur(20px); /* THE FROST!! */
+  -webkit-backdrop-filter: blur(10px); /* Safari needs her own */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translate(-50%, -50%);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+
+@keyframes buttonhover {
+  0% {
+
+    transform: scale(1);
+  }
+  100% {
+
+  }
+}
+
+
+.overlay-card.show {
+  animation: popIn 0.2s ease-out;
+}
+
+.iconimage {
+height: 20px;
+width: 20px;
+}
+
+#bgImage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+
+}
+
+@keyframes moveUp {
+  from {
+    transform: translateY(-10px);
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
+
+
+.animate-pop {
+  animation: moveUp 0.5s ease forwards;
+}
+
+
+#overthingy {
+  backdrop-filter: blur(40px); /* THE FROST!! */
+  -webkit-backdrop-filter: blur(10px); /* Safari needs her own */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 1s ease;
+
+}
+
+  </style>
+</head>
+
+<body>
+<div id="bgImage" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: -2; background-size: cover; background-position: center; opacity: 0.15;
+  pointer-events: none; transition: background-image 0.5s ease;"></div>
+  <div id="overthingy" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: -1; background-size: cover; background-position: center; opacity: 1;
+  pointer-events: none; transition: background-image 0.3s ease; backdrop-filter: blur(40px); /* THE FROST!! */
+  -webkit-backdrop-filter: blur(10px); /* Safari needs her own */"></div>
+  <button class="type-toggle" onclick="toggleViewType()"><img id="artiststoggleimg" src="{% if request.args.get('show_artists', '').lower() == 'true' %}artists.png{% else %}tracks.png{% endif %}" class="iconimage"></img></button>
+  <button class="view-toggle" onclick="toggleView()"><img id="viewimg" src="list.png" class="iconimage"></img></button>
+  <button class="type-toggle gridobj" onclick="change('small')"><img src="small.png" class="iconimage gridobj"></img></button>
+  <button class="type-toggle gridobj" onclick="change('medium')"><img src="medium.png" class="iconimage gridobj"></img></button>
+  <button class="type-toggle gridobj" onclick="change('big')"><img src="big.png" class="iconimage gridobj"></img></button>
+   <button class="type-toggle" onclick="document.location='/'"><img src="logout.png" class="iconimage"></img></button>
+<div class="overlay-backdrop" id="overlayBackdrop" onclick="closeCard()"></div>
+<div class="overlay-card" id="overlayCard">
+  <img id="cardImg" src="" alt="Cover Art" />
+  <div class="card-details">
+  <h1 id="cardTitle"></h1>
+  <p id="cardDate"></p>
+  <p id="cardartists"></p>
+  <a id="cardurl">listen...</a>
+  <br></br>
+  <button onclick="closeCard()" style="margin-top: 1rem; background:#1DB954; border:none; color:#121212; padding:0.5rem 1rem; border-radius:5px; cursor:pointer;">Close</button>
+</div>
+</div>
+
+<div class="container" id="trackContainer">
+  {% if request.args.get('show_artists', '').lower() == 'true' %}
+    {% for artist in artists %}
+    <div class="tile" onclick='showCard("{{ artist[3] }}", "{{ artist[0] }}", "Rank {{ artist[1] }}", "{{ artist[5] }}", "{{ artist[4] }}")'>
+      <img src="{{ artist[3] }}" alt="artist image" />
+      <div class="info">
+        <div class="track-title"><strong>{{ artist[0] }}</strong></div>
+        <div class="artist">{{ artist[5] }}</div>
+        <div class="date">Rank {{ artist[1] }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    {% for track in tracks %}
+    <div class="tile" onclick='showCard("{{ track[4] }}", "{{ track[0] }}", "Rank {{ track[2] }} • {{ track[6] }}", "{{ track[1] }}", "{{ track[5] }}")'>
+      <img src="{{ track[4] }}" alt="cover art" />
+      <div class="info">
+        <div class="track-title"><strong>{{ track[0] }}</strong></div>
+        <div class="artist">{{ track[1] }}</div>
+        <div class="date">Rank {{ track[2] }} • {{ track[6] }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<script>
+function toggleViewType() {
+  // This will reload the page with the opposite view type
+  const url = new URL(window.location.href);
+  url.searchParams.set('show_artists', {% if request.args.get('show_artists', '').lower() == 'true' %}false{% else %}true{% endif %});
+  window.location.href = url.toString();
+
+}
+</script>
+
+  <script>
+    let listMode = false;
+    function change(to) {
+      const container = document.getElementById('trackContainer');
+      const button = document.querySelector('.view-toggle');
+      listMode = !listMode;
+
+      if (to == "small") {
+        container.classList.add('smol');
+        container.classList.remove('big');
+        container.classList.remove('medium');
+      } else {
+            if (to == "medium") {
+                container.classList.remove('smol');
+                container.classList.remove('big');
+                container.classList.add('medium');
+            } else {
+
+            container.classList.remove('smol');
+            container.classList.add('big');
+            container.classList.remove('medium');
+            }
+      }
+    }
+
+
+    function toggleView() {
+      const container = document.getElementById('trackContainer');
+      const button = document.getElementById('viewimg');
+
+      listMode = !listMode;
+
+      if (listMode) {
+        container.classList.add('list-view');
+        button.src = "big.png";
+        document.querySelectorAll('.gridobj').forEach(buttonGrid => {buttonGrid.style.display = "none"})
+      } else {
+        container.classList.remove('list-view');
+        button.src = "list.png";
+        document.querySelectorAll('.gridobj').forEach(buttonGrid => {buttonGrid.style.display = ""})
+      }
+    }
+let isCardOpen = null
+function showCard(imgSrc, title, date, artists, link) {
+  const card = document.getElementById('overlayCard');
+  const backdrop = document.getElementById('overlayBackdrop');
+
+  document.getElementById('cardImg').src = imgSrc;
+  document.getElementById('cardTitle').textContent = title;
+  document.getElementById('cardartists').textContent = artists;
+  document.getElementById('cardDate').textContent = date;
+  document.getElementById('cardurl').href = link;
+  isCardOpen = "yes"
+  card.classList.add('show');
+  card.style.display = 'flex';
+  backdrop.style.display = 'block';
+}
+function closeCard() {
+  const card = document.getElementById('overlayCard');
+  const backdrop = document.getElementById('overlayBackdrop');
+  isCardOpen = "no"
+  card.classList.remove('show');
+  card.style.display = 'none';
+  backdrop.style.display = 'none';
+}
+
+
+
+  const bgDiv = document.getElementById('bgImage');
+
+  document.querySelectorAll('.tile').forEach(tile => {
+    const img = tile.querySelector('img');
+    const bgUrl = img.src;
+
+    tile.addEventListener('mouseenter', () => {
+      bgDiv.style.backgroundImage = `url('${bgUrl}')`;
+      bgDiv.style.opacity = '0.3'; // adjust as you like! higher = more visible
+    });
+
+    tile.addEventListener('mouseleave', () => {
+      if (isCardOpen == "no") {
+      bgDiv.style.opacity = '0'; // fade away like a ghosty~ 👻
+      }
+    });
+  });
+</script>
+
+<!-- Improved Player Bar -->
+<div class="player-bar" id="playerbarall">
+  <div class="left-controls">
+    <img id="prevBtn" class="icon-btn" src="back.png" title="Previous Track">
+    <img id="playBtn" class="icon-btn" src="play.png" title="Play/Pause">
+    <img id="nextBtn" class="icon-btn" src="next.png" title="Next Track">
+  </div>
+  <div class="track-info">
+    <img id="track-image" src="" alt="Album Art" class="track-art">
+    <div class="text">
+      <div class="track-name" onclick="refreshPlayback()">No track playing(wrong? Click to refresh!)</div>
+      <div class="track-artist">—</div>
+    </div>
+  </div>
+  <div class="center-controls">
+    <input type="range" id="progress" min="0" max="100" step="1" value="50" title="Seek" class="barslidethingy">
+  </div>
+  <div class="right-controls">
+    <input type="range" id="volume" min="0" max="100" step="0.2" value="100" title="Volume">
+
+  </div>
+</div>
+<script>
+const playBtn = document.getElementById('playBtn');
+playBtn.dataset.playing = 'false'; // Default state
+  // Helper for POSTing JSON
+  async function postJSON(path, body={}) {
+    await fetch(path, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+  }
+
+  // Play/Pause toggle
+
+  playBtn.addEventListener('click', async () => {
+    // You could also GET /current to see if it's playing
+    // but for simplicity we'll just fire pause or play based on a flag:
+    if (playBtn.dataset.playing === 'true') {
+      await postJSON('/pause');
+      playBtn.textContent = '▶️';
+      playBtn.dataset.playing = 'false';
+    } else {
+      await postJSON('/play');
+      playBtn.textContent = '⏸️';
+      playBtn.dataset.playing = 'true';
+    }
+  });
+
+  document.getElementById('prevBtn')
+    .addEventListener('click', () => postJSON('/previous'));
+
+  document.getElementById('nextBtn')
+    .addEventListener('click', () => postJSON('/next'));
+
+  // Seek slider
+  const progress = document.getElementById('progress');
+  progress.addEventListener('input', () => {
+    const position = Math.round(progress.value / 10);
+    console.log("sent " + position)
+    postJSON('/seek', { percentage: position });
+
+  });
+
+  // Volume slider
+  document.getElementById('volume')
+    .addEventListener('input', e => {
+      const vol = Math.round(e.target.value * 100);
+      postJSON('/volume', { volume_percent: vol });
+    });
+let playbackData = null;
+let progressTimer = null;
+let lastUpdateTime = null;
+
+let wasplaying = false; // NOT null!
+
+
+// do a periodic refetch every 15s to stay in sync with reality
+setInterval(refreshPlayback, 15000);
+async function refreshPlayback() {
+  try {
+    const res = await fetch('/current');
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    if (data.item) {
+    console.log("wasplaying:", wasplaying, "data.is_playing:", data.is_playing);
+
+      const currentlyPlaying = data.is_playing;
+
+      // detect state change
+      const stateChanged = wasplaying !== currentlyPlaying;
+
+      playbackData = data;
+      lastUpdateTime = Date.now();
+
+      // update UI
+      document.querySelector('.track-name').textContent = data.item.name;
+      document.querySelector('.track-artist').textContent = data.item.artists.join(', ');
+      document.getElementById('track-image').src = data.item.album_art;
+      document.getElementById("volume").value = data.vol;
+      updateVolumeSlider();
+
+      playBtn.dataset.playing = currentlyPlaying;
+      playBtn.src = currentlyPlaying ? 'pause.png' : 'play.png';
+
+      if (wasplaying && currentlyPlaying) {
+
+      } else {
+      if (wasplaying === true && currentlyPlaying === false) {
+        toggleplaybar(); // bar was up, but now there's nothing
+              stopLocalProgress();
+
+      document.querySelector('.track-name').textContent = "No track playing";
+      document.querySelector('.track-artist').textContent = "—";
+      playBtn.dataset.playing = 'false';
+      playBtn.src = 'play.png';
+      } if (wasplaying === false && currentlyPlaying === true){
+              toggleplaybar();
+
+      startLocalProgress();
+
+      }else {if (wasplaying === false && currentlyPlaying === false) {
+
+      document.querySelector('.track-name').textContent = "No track playing";
+      document.querySelector('.track-artist').textContent = "—";
+      playBtn.dataset.playing = 'false';
+      playBtn.src = 'play.png';
+
+
+      }}
+
+
+      }
+      // update playback state
+      wasplaying = currentlyPlaying;
+
+      // only toggle if state changed and is now playi
+
+
+
+    }
+
+  } catch (error) {
+    console.error("Failed to fetch playback state:", error);
+  }
+}
+
+
+function startLocalProgress() {
+  stopLocalProgress(); // prevent multiple intervals
+
+  progressTimer = setInterval(() => {
+    if (!playbackData || !playbackData.is_playing) return;
+
+    const elapsed = Date.now() - lastUpdateTime;
+    const currentProgress = playbackData.progress_ms + elapsed;
+    const duration = playbackData.duration_ms;
+
+    if (currentProgress >= duration) {
+      stopLocalProgress();
+      return;
+    }
+    const percentage = (currentProgress / duration) * 100;
+    document.getElementById("progress").value = percentage;
+    updateProgressSlider();
+  }, 1000);
+}
+
+function stopLocalProgress() {
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    progressTimer = null;
+
+  }
+}
+
+let currentstatus = "invisible";
+
+function toggleplaybar() {
+if (currentstatus == "visible") {
+  document.getElementById("playerbarall").style.display = "none";
+  document.getElementById("playerbarall").classList.remove('animate-pop');
+  currentstatus = "invisible";
+} else {
+  document.getElementById("playerbarall").style.display = "grid";
+  document.getElementById("playerbarall").classList.add('animate-pop');
+  currentstatus = "visible";
+}
+
+
+
+}
+
+
+// initial fetch!
+refreshPlayback();
+
+
+</script>
+<script>
+// Progress slider
+const progressSlider = document.getElementById('progress');
+function updateProgressSlider() {
+  const value = progressSlider.value;
+  const max = progressSlider.max;
+  const progress = (value / max) * 100;
+  progressSlider.style.setProperty('--progress', `${progress}%`);
+}
+
+progressSlider.addEventListener('input', updateProgressSlider);
+updateProgressSlider(); // Initialize
+
+// Volume slider
+const volumeSlider = document.getElementById('volume');
+function updateVolumeSlider() {
+  const value = volumeSlider.value;
+  const max = volumeSlider.max;
+  const progress = (value / max) * 100;
+  volumeSlider.style.setProperty('--progress', `${progress}%`);
+}
+
+volumeSlider.addEventListener('input', updateVolumeSlider);
+updateVolumeSlider(); // Initialize
+</script>
+
+
+</body>
+</html>
