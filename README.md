@@ -1,6 +1,5 @@
 # 🎧 OpenStats
 
-![App Screenshot](https://github.com/kurenathedev/OpenStats/blob/6aad4d2381bfb68350367a95e308ae9e6fcfc038/test.mp4)
 
 **OpenStats** is a web app that shows your **Spotify top tracks and artists**, current playback, and lets you control playback — all with ✨ local storage ✨ and a clean UI. Built with Flask + Spotipy.
 
